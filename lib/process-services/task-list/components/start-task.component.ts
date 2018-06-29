@@ -26,6 +26,7 @@ import { Form } from '../models/form.model';
 import { StartTaskModel } from '../models/start-task.model';
 import { TaskDetailsModel } from '../models/task-details.model';
 import { TaskListService } from './../services/tasklist.service';
+import { FormBuilder, FormGroup, Validators, FormControl, AbstractControl } from '@angular/forms';
 
 @Component({
     selector: 'adf-start-task',
@@ -56,7 +57,7 @@ export class StartTaskComponent implements OnInit {
     @Output()
     error: EventEmitter<any> = new EventEmitter<any>();
 
-    startTaskmodel: StartTaskModel = new StartTaskModel();
+    startTaskModel: StartTaskModel = new StartTaskModel();
 
     forms: Form[];
 
@@ -68,6 +69,10 @@ export class StartTaskComponent implements OnInit {
 
     dateError: boolean;
 
+    taskModelForm: FormGroup;
+
+    maxNameLength = 100;
+
     /**
      * Constructor
      * @param auth
@@ -77,7 +82,8 @@ export class StartTaskComponent implements OnInit {
     constructor(private taskService: TaskListService,
                 private dateAdapter: DateAdapter<Moment>,
                 private preferences: UserPreferencesService,
-                private logService: LogService) {
+                private logService: LogService,
+                private formBuilder: FormBuilder) {
     }
 
     ngOnInit() {
@@ -85,14 +91,42 @@ export class StartTaskComponent implements OnInit {
             this.dateAdapter.setLocale(locale);
         });
         this.loadFormsTask();
+        this.buildForm();
+    }
+
+    buildForm() {
+        this.taskModelForm = this.formBuilder.group({
+            taskModelName: new FormControl('', [Validators.required, Validators.maxLength(this.maxNameLength)]),
+            taskModelDescription: new FormControl(''),
+            taskModelDueDate: new FormControl(''),
+            taskModelFormKey: new FormControl('')
+        });
+
+        this.taskModelForm.valueChanges
+            .subscribe(taskFormData => {
+                if (this.isFormValid()) {
+                    this.setTaskModel(taskFormData);
+                }
+       });
+    }
+
+    isFormValid() {
+        return this.taskModelForm && this.taskModelForm.dirty && this.taskModelForm.valid;
+    }
+
+    setTaskModel(taskFormData: any) {
+        this.startTaskModel.name = taskFormData.taskModelName;
+        this.startTaskModel.description = taskFormData.taskModelDescription;
+        this.startTaskModel.dueDate = taskFormData.taskModelDueDate;
+        this.formKey = taskFormData.taskModelFormKey;
     }
 
     public start(): void {
-        if (this.startTaskmodel.name) {
+        if (this.startTaskModel.name) {
             if (this.appId) {
-                this.startTaskmodel.category = this.appId.toString();
+                this.startTaskModel.category = this.appId.toString();
             }
-            this.taskService.createNewTask(new TaskDetailsModel(this.startTaskmodel))
+            this.taskService.createNewTask(new TaskDetailsModel(this.startTaskModel))
                 .switchMap((createRes: any) =>
                     this.attachForm(createRes.id, this.formKey).defaultIfEmpty(createRes)
                         .switchMap((attachRes: any) =>
@@ -163,5 +197,9 @@ export class StartTaskComponent implements OnInit {
                 this.dateError = true;
             }
         }
+    }
+
+    get taskName(): AbstractControl {
+        return this.taskModelForm.get('taskModelName');
     }
 }

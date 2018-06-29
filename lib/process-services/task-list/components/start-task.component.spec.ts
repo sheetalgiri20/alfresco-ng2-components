@@ -88,7 +88,8 @@ describe('StartTaskComponent', () => {
         it('should create new task when start is clicked', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.appId = 42;
-            component.startTaskmodel = new StartTaskModel(startTaskMock);
+            component.startTaskModel = new StartTaskModel(startTaskMock);
+            spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -98,7 +99,8 @@ describe('StartTaskComponent', () => {
         it('should send on success event when the task is started', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.appId = 42;
-            component.startTaskmodel = new StartTaskModel(startTaskMock);
+            component.startTaskModel = new StartTaskModel(startTaskMock);
+            spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -113,7 +115,8 @@ describe('StartTaskComponent', () => {
         it('should send on success event when only name is given', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.appId = 42;
-            component.startTaskmodel.name = 'fakeName';
+            component.startTaskModel.name = 'fakeName';
+            spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -122,7 +125,8 @@ describe('StartTaskComponent', () => {
 
         it('should not emit success event when data not present', () => {
             let successSpy = spyOn(component.success, 'emit');
-            component.startTaskmodel = new StartTaskModel(null);
+            component.startTaskModel = new StartTaskModel(null);
+            spyOn(component, 'isFormValid').and.returnValue(false);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -154,8 +158,9 @@ describe('StartTaskComponent', () => {
         it('should attach form to the task when a form is selected', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.appId = 42;
-            component.startTaskmodel = new StartTaskModel(startTaskMock);
+            component.startTaskModel = new StartTaskModel(startTaskMock);
             component.formKey = 1204;
+            spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -170,8 +175,9 @@ describe('StartTaskComponent', () => {
         it('should not attach form to the task when a no form is selected', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.appId = 42;
-            component.startTaskmodel = new StartTaskModel(startTaskMock);
+            component.startTaskModel = new StartTaskModel(startTaskMock);
             component.formKey = null;
+            spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -215,9 +221,10 @@ describe('StartTaskComponent', () => {
         it('should assign task when an assignee is selected', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.appId = 42;
-            component.startTaskmodel = new StartTaskModel(startTaskMock);
+            component.startTaskModel = new StartTaskModel(startTaskMock);
             component.formKey = 1204;
             component.assigneeId = testUser.id;
+            spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -234,7 +241,8 @@ describe('StartTaskComponent', () => {
             component.appId = 42;
             component.formKey = 1204;
             component.assigneeId = null;
-            component.startTaskmodel = new StartTaskModel(startTaskMock);
+            component.startTaskModel = new StartTaskModel(startTaskMock);
+            spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
             createTaskButton.click();
@@ -256,14 +264,18 @@ describe('StartTaskComponent', () => {
                     observer.complete();
                 });
             });
+        spyOn(component, 'isFormValid').and.returnValue(true);
+        fixture.detectChanges();
         let createTaskButton = <HTMLElement> element.querySelector('#button-start');
-        component.startTaskmodel.name = 'fake-name';
+        component.startTaskModel.name = 'fake-name';
         fixture.detectChanges();
         createTaskButton.click();
         expect(attachFormToATask).not.toHaveBeenCalled();
     });
 
     it('should show start task button', () => {
+        spyOn(component, 'isFormValid').and.returnValue(true);
+        fixture.detectChanges();
         expect(element.querySelector('#button-start')).toBeDefined();
         expect(element.querySelector('#button-start')).not.toBeNull();
         expect(element.querySelector('#button-start').textContent).toContain('ADF_TASK_LIST.START_TASK.FORM.ACTION.START');
@@ -277,7 +289,8 @@ describe('StartTaskComponent', () => {
     });
 
     it('should disable start button if name is empty', () => {
-        component.startTaskmodel.name = '';
+        component.startTaskModel.name = '';
+        spyOn(component, 'isFormValid').and.returnValue(false);
         fixture.detectChanges();
         let createTaskButton =  fixture.nativeElement.querySelector('#button-start');
         expect(createTaskButton.disabled).toBeTruthy();
@@ -285,8 +298,8 @@ describe('StartTaskComponent', () => {
 
     it('should cancel start task on cancel button click', () => {
         let emitSpy = spyOn(component.cancel, 'emit');
-        let cancleTaskButton =  fixture.nativeElement.querySelector('#button-cancle');
-        component.startTaskmodel.name = '';
+        let cancleTaskButton =  fixture.nativeElement.querySelector('#button-cancel');
+        component.startTaskModel.name = '';
         fixture.detectChanges();
         cancleTaskButton.click();
         expect(emitSpy).not.toBeNull();
@@ -294,7 +307,8 @@ describe('StartTaskComponent', () => {
     });
 
     it('should enable start button if name is filled out', () => {
-        component.startTaskmodel.name = 'fakeName';
+        component.startTaskModel.name = 'fakeName';
+        spyOn(component, 'isFormValid').and.returnValue(true);
         fixture.detectChanges();
         let createTaskButton = fixture.nativeElement.querySelector('#button-start');
         expect(createTaskButton.disabled).toBeFalsy();
@@ -327,8 +341,10 @@ describe('StartTaskComponent', () => {
     it('should emit error when there is an error while creating task', () => {
         let errorSpy = spyOn(component.error, 'emit');
         spyOn(service, 'createNewTask').and.returnValue(Observable.throw({}));
+        spyOn(component, 'isFormValid').and.returnValue(true);
+        fixture.detectChanges();
         let createTaskButton = <HTMLElement> element.querySelector('#button-start');
-        component.startTaskmodel.name = 'fake-name';
+        component.startTaskModel.name = 'fake-name';
         fixture.detectChanges();
         createTaskButton.click();
         expect(errorSpy).toHaveBeenCalled();
