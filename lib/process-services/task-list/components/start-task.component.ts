@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { LogService, UserPreferencesService, UserProcessModel } from '@alfresco/adf-core';
+import { LogService, UserPreferencesService, UserProcessModel, TranslationService } from '@alfresco/adf-core';
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MOMENT_DATE_FORMATS, MomentDateAdapter } from '@alfresco/adf-core';
@@ -23,7 +23,6 @@ import moment from 'moment-es6';
 import { Moment } from 'moment';
 import { Observable } from 'rxjs/Observable';
 import { Form } from '../models/form.model';
-import { StartTaskModel } from '../models/start-task.model';
 import { TaskDetailsModel } from '../models/task-details.model';
 import { TaskListService } from './../services/tasklist.service';
 import { FormBuilder, FormGroup, Validators, FormControl, AbstractControl } from '@angular/forms';
@@ -45,6 +44,12 @@ export class StartTaskComponent implements OnInit {
     @Input()
     appId: number;
 
+    @Input()
+    maxTaskNameLength: number = 100;
+
+    @Input()
+    defaultTaskName: string = '';
+
     /** Emitted when the task is successfully created. */
     @Output()
     success: EventEmitter<any> = new EventEmitter<any>();
@@ -57,21 +62,15 @@ export class StartTaskComponent implements OnInit {
     @Output()
     error: EventEmitter<any> = new EventEmitter<any>();
 
-    startTaskModel: StartTaskModel = new StartTaskModel();
-
-    forms: Form[];
-
-    assigneeId: number;
-
-    formKey: number;
-
-    taskId: string;
+    forms$: Observable<Form []>;
 
     dateError: boolean;
 
+    defaultTaskNameTranslated: string;
+
     taskModelForm: FormGroup;
 
-    maxNameLength = 100;
+    taskDetailsModel: TaskDetailsModel = new TaskDetailsModel();
 
     /**
      * Constructor
@@ -83,20 +82,22 @@ export class StartTaskComponent implements OnInit {
                 private dateAdapter: DateAdapter<Moment>,
                 private preferences: UserPreferencesService,
                 private logService: LogService,
-                private formBuilder: FormBuilder) {
+                private formBuilder: FormBuilder,
+                private translateService: TranslationService) {
     }
 
     ngOnInit() {
         this.preferences.locale$.subscribe((locale) => {
             this.dateAdapter.setLocale(locale);
         });
+        this.defaultTaskNameTranslated = this.translateService.instant(this.defaultTaskName);
         this.loadFormsTask();
         this.buildForm();
     }
 
     buildForm() {
         this.taskModelForm = this.formBuilder.group({
-            taskModelName: new FormControl('', [Validators.required, Validators.maxLength(this.maxNameLength)]),
+            taskModelName: new FormControl(this.defaultTaskNameTranslated, [Validators.required, Validators.maxLength(this.maxTaskNameLength)]),
             taskModelDescription: new FormControl(''),
             taskModelDueDate: new FormControl(''),
             taskModelFormKey: new FormControl('')
@@ -105,7 +106,7 @@ export class StartTaskComponent implements OnInit {
         this.taskModelForm.valueChanges
             .subscribe(taskFormData => {
                 if (this.isFormValid()) {
-                    this.setTaskModel(taskFormData);
+                    this.setTaskDetailsModel(taskFormData);
                 }
        });
     }
@@ -114,34 +115,33 @@ export class StartTaskComponent implements OnInit {
         return this.taskModelForm && this.taskModelForm.dirty && this.taskModelForm.valid;
     }
 
-    setTaskModel(taskFormData: any) {
-        this.startTaskModel.name = taskFormData.taskModelName;
-        this.startTaskModel.description = taskFormData.taskModelDescription;
-        this.startTaskModel.dueDate = taskFormData.taskModelDueDate;
-        this.formKey = taskFormData.taskModelFormKey;
+    setTaskDetailsModel(taskFormData: any) {
+        if (this.appId) {
+            this.taskDetailsModel.category = this.appId.toString();
+        }
+
+        this.taskDetailsModel.name = taskFormData.taskModelName;
+        this.taskDetailsModel.description = taskFormData.taskModelDescription;
+        this.taskDetailsModel.dueDate = taskFormData.taskModelDueDate;
+        this.taskDetailsModel.formKey = taskFormData.taskModelFormKey;
     }
 
-    public start(): void {
-        if (this.startTaskModel.name) {
-            if (this.appId) {
-                this.startTaskModel.category = this.appId.toString();
-            }
-            this.taskService.createNewTask(new TaskDetailsModel(this.startTaskModel))
-                .switchMap((createRes: any) =>
-                    this.attachForm(createRes.id, this.formKey).defaultIfEmpty(createRes)
-                        .switchMap((attachRes: any) =>
-                            this.assignTaskByUserId(createRes.id, this.assigneeId).defaultIfEmpty(attachRes ? attachRes : createRes)
-                        )
-                )
-                .subscribe(
-                    (res: any) => {
-                        this.success.emit(res);
-                    },
-                    (err) => {
-                        this.error.emit(err);
-                        this.logService.error('An error occurred while creating new task');
-                    });
-        }
+    public saveTask(): void {
+        this.taskService.createNewTask(this.taskDetailsModel)
+            .switchMap((createRes: any) =>
+                this.attachForm(createRes.id, this.formKey).defaultIfEmpty(createRes)
+                    .switchMap((attachRes: any) =>
+                        this.assignTaskByUserId(createRes.id, this.assigneeId).defaultIfEmpty(attachRes ? attachRes : createRes)
+                    )
+            )
+            .subscribe(
+                (res: any) => {
+                    this.success.emit(res);
+                },
+                (err) => {
+                    this.error.emit(err);
+                    this.logService.error('An error occurred while creating new task');
+                });
     }
 
     private attachForm(taskId: string, formKey: number): Observable<any> {
@@ -165,13 +165,7 @@ export class StartTaskComponent implements OnInit {
     }
 
     private loadFormsTask(): void {
-        this.taskService.getFormList().subscribe((res: Form[]) => {
-                this.forms = res;
-            },
-            (err) => {
-                this.error.emit(err);
-                this.logService.error('An error occurred while trying to get the forms');
-            });
+        this.forms$ = this.taskService.getFormList();
     }
 
     public isUserNameEmpty(user: UserProcessModel): boolean {
