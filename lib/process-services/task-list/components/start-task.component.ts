@@ -64,13 +64,17 @@ export class StartTaskComponent implements OnInit {
 
     forms$: Observable<Form []>;
 
-    dateError: boolean;
+    dateError: boolean = false;
 
     defaultTaskNameTranslated: string;
 
     taskModelForm: FormGroup;
 
     taskDetailsModel: TaskDetailsModel = new TaskDetailsModel();
+
+    assigneeId: number;
+
+    formKey: number;
 
     /**
      * Constructor
@@ -104,15 +108,15 @@ export class StartTaskComponent implements OnInit {
         });
 
         this.taskModelForm.valueChanges
-            .subscribe(taskFormData => {
-                if (this.isFormValid()) {
-                    this.setTaskDetailsModel(taskFormData);
-                }
-       });
+        .subscribe(taskFormData => {
+            if (this.isFormValid()) {
+                this.setTaskDetailsModel(taskFormData);
+            }
+        });
     }
 
     isFormValid() {
-        return this.taskModelForm && this.taskModelForm.dirty && this.taskModelForm.valid;
+        return this.taskModelForm && this.taskModelForm.valid;
     }
 
     setTaskDetailsModel(taskFormData: any) {
@@ -122,8 +126,11 @@ export class StartTaskComponent implements OnInit {
 
         this.taskDetailsModel.name = taskFormData.taskModelName;
         this.taskDetailsModel.description = taskFormData.taskModelDescription;
+        this.formKey = taskFormData.taskModelFormKey;
+
+        this.onDateChanged(taskFormData.taskModelDueDate);
+
         this.taskDetailsModel.dueDate = taskFormData.taskModelDueDate;
-        this.taskDetailsModel.formKey = taskFormData.taskModelFormKey;
     }
 
     public saveTask(): void {

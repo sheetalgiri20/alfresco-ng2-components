@@ -86,8 +86,8 @@ describe('StartTaskComponent', () => {
 
         it('should create new task when start is clicked', () => {
             let successSpy = spyOn(component.success, 'emit');
-            component.appId = 42;
-            component.taskDetailsModel = new TaskDetailsModel(taskDetailsMock);
+            component.taskModelForm.controls['taskModelName'].setValue('task');
+            component.taskModelForm.controls['taskModelDueDate'].setValue('06/06/2019');
             spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
@@ -97,7 +97,6 @@ describe('StartTaskComponent', () => {
 
         it('should send on success event when the task is started', () => {
             let successSpy = spyOn(component.success, 'emit');
-            component.appId = 42;
             component.taskDetailsModel = new TaskDetailsModel(taskDetailsMock);
             spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
@@ -175,7 +174,7 @@ describe('StartTaskComponent', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.appId = 42;
             component.taskDetailsModel = new TaskDetailsModel(taskDetailsMock);
-            component.formKey = null;
+            component.taskModelForm.controls['taskModelFormKey'].setValue(null);
             spyOn(component, 'isFormValid').and.returnValue(true);
             fixture.detectChanges();
             let createTaskButton = <HTMLElement> element.querySelector('#button-start');
