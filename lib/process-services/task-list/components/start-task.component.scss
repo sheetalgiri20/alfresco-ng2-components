@@ -73,7 +73,7 @@
                 }
             }
 
-            &-start-task-input-container .mat-input-wrapper {
+            &-start-task-input-container .mat-form-field-wrapper {
                 padding-top: 8px;
             }
 
@@ -110,7 +110,7 @@
 
             &-invalid {
 
-                .mat-input-underline {
+                .mat-form-field-underline {
                     background-color: #f44336 !important;
                 }
 
@@ -118,7 +118,7 @@
                     border-color: mat-color($warn);
                 }
 
-                .mat-input-prefix {
+                .mat-form-field-prefix {
                     color: mat-color($warn);
                 }
 
