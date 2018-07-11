@@ -25,6 +25,7 @@ import { SearchCategory } from '../../search-category.interface';
 import { ResponseFacetQuery } from '../../response-facet-query.interface';
 import { ResponseFacetQueryList } from './models/response-facet-query-list.model';
 import { SearchFilterList } from './models/search-filter-list.model';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
     selector: 'adf-search-filter',
@@ -58,18 +59,19 @@ export class SearchFilterComponent implements OnInit, OnDestroy {
             this.facetQueriesExpanded = queryBuilder.config.facetQueries.expanded;
         }
 
-        this.queryBuilder.updated
-            .takeWhile(() => this.isAlive)
-            .subscribe(query => {
+        this.queryBuilder.updated.pipe(
+            takeWhile(() => this.isAlive)
+        ).subscribe(query => {
             this.queryBuilder.execute();
         });
     }
 
     ngOnInit() {
         if (this.queryBuilder) {
-            this.queryBuilder.executed
-                .takeWhile(() => this.isAlive)
-                .subscribe(data => {
+            this.queryBuilder.executed.pipe(
+                takeWhile(() => this.isAlive)
+            )
+            .subscribe(data => {
                 this.onDataLoaded(data);
                 this.searchService.dataLoaded.next(data);
             });

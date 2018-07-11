@@ -28,7 +28,7 @@ import {
     CardViewUpdateService,
     UpdateNotification
 } from '@alfresco/adf-core';
-import { of } from 'rxjs/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: './card-view.component.html',

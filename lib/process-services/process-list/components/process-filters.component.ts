@@ -18,10 +18,10 @@
 import { AppsProcessService } from '@alfresco/adf-core';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ProcessInstanceFilterRepresentation } from 'alfresco-js-api';
-import { Observable } from 'rxjs/Observable';
-import { Observer } from 'rxjs/Observer';
+import { Observable, Observer } from 'rxjs';
 import { FilterProcessRepresentationModel } from '../models/filter-process.model';
 import { ProcessFilterService } from './../services/process-filter.service';
+import { share } from 'rxjs/operators';
 
 @Component({
     selector: 'adf-process-instance-filters',
@@ -68,7 +68,8 @@ export class ProcessFiltersComponent implements OnInit, OnChanges {
     filters: ProcessInstanceFilterRepresentation [] = [];
 
     constructor(private processFilterService: ProcessFilterService, private appsProcessService: AppsProcessService) {
-        this.filter$ = new Observable<ProcessInstanceFilterRepresentation>(observer => this.filterObserver = observer).share();
+        this.filter$ = new Observable<ProcessInstanceFilterRepresentation>(observer => this.filterObserver = observer)
+            .pipe(share());
     }
 
     ngOnInit() {
