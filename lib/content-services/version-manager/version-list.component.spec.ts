@@ -21,7 +21,7 @@ import { By } from '@angular/platform-browser';
 import { VersionListComponent } from './version-list.component';
 import { AlfrescoApiService, setupTestBed, CoreModule, AlfrescoApiServiceMock } from '@alfresco/adf-core';
 import { MatDialog } from '@angular/material';
-import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('VersionListComponent', () => {
@@ -66,7 +66,7 @@ describe('VersionListComponent', () => {
     it('should raise confirmation dialog on delete', () => {
         spyOn(dialog, 'open').and.returnValue({
             afterClosed() {
-                return Observable.of(false);
+                return of(false);
             }
         });
 
@@ -79,7 +79,7 @@ describe('VersionListComponent', () => {
         spyOn(alfrescoApiService.versionsApi, 'listVersionHistory').and.returnValue(Promise.resolve({ list: { entries: [] } }));
         spyOn(dialog, 'open').and.returnValue({
             afterClosed() {
-                return Observable.of(true);
+                return of(true);
             }
         });
 
@@ -94,7 +94,7 @@ describe('VersionListComponent', () => {
     it('should not delete version if user rejects', () => {
         spyOn(dialog, 'open').and.returnValue({
             afterClosed() {
-                return Observable.of(false);
+                return of(false);
             }
         });
 

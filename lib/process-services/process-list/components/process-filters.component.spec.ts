@@ -17,7 +17,7 @@
 
 import { SimpleChange } from '@angular/core';
 import { AppsProcessService } from '@alfresco/adf-core';
-import { Observable } from 'rxjs/Observable';
+import { from } from 'rxjs';
 import { FilterProcessRepresentationModel } from '../models/filter-process.model';
 import { ProcessFilterService } from '../services/process-filter.service';
 import { ProcessFiltersComponent } from './process-filters.component';
@@ -56,7 +56,7 @@ describe('ProcessFiltersComponent', () => {
     });
 
     it('should return the filter task list', (done) => {
-        spyOn(processFilterService, 'getProcessFilters').and.returnValue(Observable.fromPromise(fakeGlobalFilterPromise));
+        spyOn(processFilterService, 'getProcessFilters').and.returnValue(from(fakeGlobalFilterPromise));
         const appId = '1';
         let change = new SimpleChange(null, appId, true);
         filterList.ngOnChanges({ 'appId': change });
@@ -75,7 +75,7 @@ describe('ProcessFiltersComponent', () => {
     });
 
     it('should select the Running process filter', (done) => {
-        spyOn(processFilterService, 'getProcessFilters').and.returnValue(Observable.fromPromise(fakeGlobalFilterPromise));
+        spyOn(processFilterService, 'getProcessFilters').and.returnValue(from(fakeGlobalFilterPromise));
         const appId = '1';
         let change = new SimpleChange(null, appId, true);
         filterList.ngOnChanges({ 'appId': change });
@@ -92,8 +92,8 @@ describe('ProcessFiltersComponent', () => {
     });
 
     it('should return the filter task list, filtered By Name', (done) => {
-        spyOn(appsProcessService, 'getDeployedApplicationsByName').and.returnValue(Observable.fromPromise(Promise.resolve({ id: 1 })));
-        spyOn(processFilterService, 'getProcessFilters').and.returnValue(Observable.fromPromise(fakeGlobalFilterPromise));
+        spyOn(appsProcessService, 'getDeployedApplicationsByName').and.returnValue(from(Promise.resolve({ id: 1 })));
+        spyOn(processFilterService, 'getProcessFilters').and.returnValue(from(fakeGlobalFilterPromise));
 
         let change = new SimpleChange(null, 'test', true);
         filterList.ngOnChanges({ 'appName': change });
@@ -109,7 +109,7 @@ describe('ProcessFiltersComponent', () => {
     });
 
     it('should emit an error with a bad response', (done) => {
-        spyOn(processFilterService, 'getProcessFilters').and.returnValue(Observable.fromPromise(mockErrorFilterPromise));
+        spyOn(processFilterService, 'getProcessFilters').and.returnValue(from(mockErrorFilterPromise));
 
         const appId = '1';
         let change = new SimpleChange(null, appId, true);
@@ -124,7 +124,7 @@ describe('ProcessFiltersComponent', () => {
     });
 
     it('should emit an error with a bad response', (done) => {
-        spyOn(appsProcessService, 'getDeployedApplicationsByName').and.returnValue(Observable.fromPromise(mockErrorFilterPromise));
+        spyOn(appsProcessService, 'getDeployedApplicationsByName').and.returnValue(from(mockErrorFilterPromise));
 
         const appId = 'fake-app';
         let change = new SimpleChange(null, appId, true);
@@ -197,7 +197,7 @@ describe('ProcessFiltersComponent', () => {
     });
 
     it ('should select current process filter', (done) => {
-        spyOn(processFilterService, 'getProcessFilters').and.returnValue(Observable.fromPromise(fakeGlobalFilterPromise));
+        spyOn(processFilterService, 'getProcessFilters').and.returnValue(from(fakeGlobalFilterPromise));
         const appId = '1';
         let change = new SimpleChange(null, appId, true);
         filterList.ngOnChanges({ 'appId': change });
