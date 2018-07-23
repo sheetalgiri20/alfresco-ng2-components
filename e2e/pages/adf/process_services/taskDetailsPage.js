@@ -38,6 +38,9 @@ var TaskDetailsPage = function () {
     var addInvolvedUserButton = element(by.css("button[id='add-people'] span"));
     var emailInvolvedUser = by.xpath("following-sibling::div[@class='people-email ng-star-inserted']");
     var infoDrawer = element(by.css("adf-info-drawer"));
+    var taskDetailsSection = element(by.css("div[class='adf-task-details ng-star-inserted']"));
+    var taskDetailsEmptySection = element(by.css("div[class='full-width adf-data-table ng-star-inserted adf-data-table--empty']"));
+    var completeTask = element(by.css("button[id='adf-no-form-complete-button']"));
     var auditLogButton = element(by.css("button[adf-task-audit]"));
 
 
@@ -186,6 +189,38 @@ var TaskDetailsPage = function () {
 
     this.taskInfoDrawerIsNotDisplayed = function () {
         Util.waitUntilElementIsNotOnPage(infoDrawer);
+    };
+
+    this.checkTaskDetails = function () {
+        Util.waitUntilElementIsVisible(taskDetailsSection);
+        return taskDetailsSection.getText();
+    };
+
+    this.checkTaskDetailsEmpty = function () {
+        Util.waitUntilElementIsVisible(taskDetailsEmptySection);
+        return taskDetailsEmptySection.getText();
+    };
+
+    this.checkTaskDetailsDisplayed = function () {
+        Util.waitUntilElementIsVisible(taskDetailsSection);
+        Util.waitUntilElementIsVisible(formNameField);
+        Util.waitUntilElementIsVisible(assigneeField);
+        Util.waitUntilElementIsVisible(statusField);
+        Util.waitUntilElementIsVisible(categoryField);
+        Util.waitUntilElementIsVisible(parentNameField);
+        Util.waitUntilElementIsVisible(createdField);
+        Util.waitUntilElementIsVisible(idField);
+        Util.waitUntilElementIsVisible(descriptionField);
+        Util.waitUntilElementIsVisible(dueDateField);
+        Util.waitUntilElementIsVisible(dueDateField);
+        Util.waitUntilElementIsVisible(activitiesTitle);
+
+        return taskDetailsSection.getText();
+    };
+
+    this.clickCompleteTask = function () {
+        Util.waitUntilElementIsVisible(completeTask);
+        return completeTask.click();
     };
 
 };
