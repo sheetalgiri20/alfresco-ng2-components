@@ -57,6 +57,9 @@ var ViewerToolbarPage = function () {
     var viewer = element(by.css("adf-viewer"));
     var pdfViewer = element(by.css("adf-pdf-viewer"));
     var imgViewer = element(by.css("adf-img-viewer"));
+    var activeTab = element(by.css("div[class*='mat-tab-label-active']"));
+    var uploadNewVersionButton = element(by.css("input[data-automation-id='upload-single-file']"));
+    var rightChevron = element(by.css("div[class*='header-pagination-after']"));
 
     this.canvasHeight = function () {
         var deferred = protractor.promise.defer();
@@ -77,10 +80,10 @@ var ViewerToolbarPage = function () {
     };
 
     this.viewFile = function (fileName) {
-        var fileView = element(by.xpath("//div[@class='document-list-container']//span[@title='" + fileName + "']"));
+        var fileView = element.all(by.xpath("//div[@class='document-list-container']//span[@title='" + fileName + "']")).first();
         Util.waitUntilElementIsVisible(fileView);
         fileView.click();
-        return browser.actions().sendKeys(protractor.Key.ENTER).perform();
+        browser.actions().sendKeys(protractor.Key.ENTER).perform();
     };
 
     this.clearPageNumber = function () {
@@ -301,8 +304,7 @@ var ViewerToolbarPage = function () {
 
     this.clickInfoButton = function () {
         Util.waitUntilElementIsVisible(infoButton);
-        infoButton.click();
-        return new CardViewPage();
+        return infoButton.click();
     };
 
     this.clickPasswordSubmit = function () {
@@ -388,6 +390,52 @@ var ViewerToolbarPage = function () {
     this.clickRotateRightButton = function () {
         Util.waitUntilElementIsClickable(rotateRight);
         return rotateRight.click();
+    };
+
+    this.getActiveTab = function () {
+        Util.waitUntilElementIsVisible(activeTab);
+        return activeTab.getText();
+    };
+
+    this.checkUnsupportedFileContainerIsDisplayed = function () {
+        Util.waitUntilElementIsVisible(unsupportedFileContainer);
+    };
+
+    this.clickRightChevronToGetToTab = (tabName) => {
+        element.all(by.css('.mat-tab-label'))
+            .map((element) => element.getAttribute('innerText'))
+            .then((texts) => {
+                for (let text of texts) {
+                    if (text === tabName ) {
+                        break;
+                    }
+                    this.clickRightChevron();
+                }
+            });
+    };
+
+    this.clickRightChevron = function() {
+        Util.waitUntilElementIsVisible(rightChevron);
+        rightChevron.click();
+        return this;
+    };
+
+    this.clickOnVersionsTab = function() {
+        this.clickRightChevronToGetToTab('Versions');
+        var versionsTab = element(by.cssContainingText("div[id*='mat-tab-label']", "Versions"));
+        Util.waitUntilElementIsVisible(versionsTab);
+        versionsTab.click();
+        return this;
+    };
+
+    this.checkUploadVersionsButtonIsDisplayed = function() {
+        Util.waitUntilElementIsVisible(uploadNewVersionButton);
+        return this;
+    };
+
+    this.checkVersionIsDisplayed = function(version) {
+        Util.waitUntilElementIsVisible(element(by.cssContainingText("h4[class*='adf-version-list-item-name']", version)));
+        return this;
     };
 };
 
