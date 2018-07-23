@@ -122,8 +122,8 @@ exports.PROCESSSTATUS = {
 };
 
 exports.SITEMEMBERROLES = {
-    SITECONSUMER: 'SiteConsumer',
-    SITECOLLABORATOR: 'SiteCollaborator',
-    SITECONTRIBUTOR: 'SiteContributor',
-    SITEMANAGER: 'SiteManager'
+    SITECONSUMER: "SiteConsumer",
+    SITECOLLABORATOR: "SiteCollaborator",
+    SITECONTRIBUTOR: "SiteContributor",
+    SITEMANAGER: "SiteManager"
 };
