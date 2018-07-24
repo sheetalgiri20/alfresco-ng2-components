@@ -22,8 +22,8 @@ import { Observable } from 'rxjs/Observable';
 import { TaskListService } from '../services/tasklist.service';
 import { StartTaskComponent } from './start-task.component';
 import { ProcessTestingModule } from '../../testing/process.testing.module';
-import { TaskDetailsModel } from '..';
 import { taskDetailsMock } from '../../mock/task/task-details.mock';
+import { TaskDetailsModel } from '../models/task-details.model';
 
 describe('StartTaskComponent', () => {
 
@@ -36,14 +36,14 @@ describe('StartTaskComponent', () => {
     let fakeForms$ = Observable.of([
         {
             id: 123,
-           name: 'Display Data'
+            name: 'Display Data'
         },
-       {
+        {
             id: 1111,
-           name: 'Employee Info'
+            name: 'Employee Info'
         }
     ]);
-    let testUser = {id: 1001, firstName: 'fakeName', email: 'fake@app.activiti.com'};
+    let testUser = { id: 1001, firstName: 'fakeName', email: 'fake@app.activiti.com' };
 
     setupTestBed({
         imports: [ProcessTestingModule]
@@ -230,6 +230,24 @@ describe('StartTaskComponent', () => {
             });
         });
 
+        it('should assign task with id of selected user assigned', () => {
+            let successSpy = spyOn(component.success, 'emit');
+            component.taskDetailsModel = new TaskDetailsModel(taskDetailsMock);
+            component.taskModelForm.controls['taskModelName'].setValue('fakeName');
+            component.appId = 42;
+            component.formKey = 1204;
+            component.getAssigneeId(testUser.id);
+            fixture.detectChanges();
+            let createTaskButton = <HTMLElement> element.querySelector('#button-start');
+            createTaskButton.click();
+            expect(successSpy).toHaveBeenCalledWith({
+                id: 91,
+                name: 'fakeName',
+                formKey: 1204,
+                assignee: testUser
+            });
+        });
+
         it('should not assign task when no assignee is selected', () => {
             let successSpy = spyOn(component.success, 'emit');
             component.taskModelForm.controls['taskModelName'].setValue('fakeName');
@@ -249,29 +267,12 @@ describe('StartTaskComponent', () => {
         });
     });
 
-    it('should assign task with id of selected user assigned', () => {
-        let successSpy = spyOn(component.success, 'emit');
-        component.appId = 42;
-        component.taskDetailsModel = new TaskDetailsModel(taskDetailsMock);
-        component.formKey = 1204;
-        component.getAssigneeId(testUser.id);
-        fixture.detectChanges();
-        let createTaskButton = <HTMLElement> element.querySelector('#button-start');
-        createTaskButton.click();
-        expect(successSpy).toHaveBeenCalledWith({
-            id: 91,
-            name: 'fakeName',
-            formKey: 1204,
-            assignee: testUser
-        });
-    });
-
     it('should not attach a form when a form id is not selected', () => {
         let attachFormToATask = spyOn(service, 'attachFormToATask').and.returnValue(Observable.of());
         spyOn(service, 'createNewTask').and.callFake(
-            function() {
+            function () {
                 return Observable.create(observer => {
-                    observer.next({ id: 'task-id'});
+                    observer.next({ id: 'task-id' });
                     observer.complete();
                 });
             });
@@ -301,16 +302,16 @@ describe('StartTaskComponent', () => {
     it('should disable start button if name is empty', () => {
         component.taskDetailsModel.name = '';
         fixture.detectChanges();
-        let createTaskButton =  fixture.nativeElement.querySelector('#button-start');
+        let createTaskButton = fixture.nativeElement.querySelector('#button-start');
         expect(createTaskButton.disabled).toBeTruthy();
     });
 
     it('should cancel start task on cancel button click', () => {
         let emitSpy = spyOn(component.cancel, 'emit');
-        let cancleTaskButton =  fixture.nativeElement.querySelector('#button-cancel');
+        let cancelTaskButton = <HTMLElement> element.querySelector('#button-cancel');
         component.taskDetailsModel.name = '';
         fixture.detectChanges();
-        cancleTaskButton.click();
+        cancelTaskButton.click();
         expect(emitSpy).not.toBeNull();
         expect(emitSpy).toHaveBeenCalled();
     });
@@ -330,10 +331,10 @@ describe('StartTaskComponent', () => {
     });
 
     it('should get formatted fullname', () => {
-        let testUser1 = {'id': 1001, 'firstName': 'Wilbur', 'lastName': 'Adams', 'email': 'wilbur@app.activiti.com'};
-        let testUser2 = {'id': 1002, 'firstName': '', 'lastName': 'Adams', 'email': 'adams@app.activiti.com'};
-        let testUser3 = {'id': 1003, 'firstName': 'Wilbur', 'lastName': '', 'email': 'wilbur@app.activiti.com'};
-        let testUser4 = {'id': 1004, 'firstName': '', 'lastName': '', 'email': 'test@app.activiti.com'};
+        let testUser1 = { 'id': 1001, 'firstName': 'Wilbur', 'lastName': 'Adams', 'email': 'wilbur@app.activiti.com' };
+        let testUser2 = { 'id': 1002, 'firstName': '', 'lastName': 'Adams', 'email': 'adams@app.activiti.com' };
+        let testUser3 = { 'id': 1003, 'firstName': 'Wilbur', 'lastName': '', 'email': 'wilbur@app.activiti.com' };
+        let testUser4 = { 'id': 1004, 'firstName': '', 'lastName': '', 'email': 'test@app.activiti.com' };
 
         let testFullname1 = component.getDisplayUser(testUser1.firstName, testUser1.lastName, ' ');
         let testFullname2 = component.getDisplayUser(testUser2.firstName, testUser2.lastName, ' ');
@@ -362,7 +363,7 @@ describe('StartTaskComponent', () => {
         component.maxTaskNameLength = 2;
         component.ngOnInit();
         fixture.detectChanges();
-        let name =  component.taskModelForm.controls['taskModelName'];
+        let name = component.taskModelForm.controls['taskModelName'];
         name.setValue('task');
         fixture.detectChanges();
         expect(name.valid).toBeFalsy();
@@ -373,7 +374,7 @@ describe('StartTaskComponent', () => {
 
     it('should emit error when task name field is empty', () => {
         fixture.detectChanges();
-        let name =  component.taskModelForm.controls['taskModelName'];
+        let name = component.taskModelForm.controls['taskModelName'];
         name.setValue('');
         fixture.detectChanges();
         expect(name.valid).toBeFalsy();
