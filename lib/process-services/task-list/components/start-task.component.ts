@@ -103,7 +103,6 @@ export class StartTaskComponent implements OnInit {
         this.taskModelForm = this.formBuilder.group({
             taskModelName: new FormControl(this.defaultTaskNameTranslated, [Validators.required, Validators.maxLength(this.maxTaskNameLength)]),
             taskModelDescription: new FormControl(''),
-            taskModelDueDate: new FormControl(''),
             taskModelFormKey: new FormControl('')
         });
 
@@ -127,10 +126,6 @@ export class StartTaskComponent implements OnInit {
         this.taskDetailsModel.name = taskFormData.taskModelName;
         this.taskDetailsModel.description = taskFormData.taskModelDescription;
         this.formKey = taskFormData.taskModelFormKey;
-
-        this.onDateChanged(taskFormData.taskModelDueDate);
-
-        this.taskDetailsModel.dueDate = taskFormData.taskModelDueDate;
     }
 
     public saveTask(): void {
