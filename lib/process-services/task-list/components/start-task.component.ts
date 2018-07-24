@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { LogService, UserPreferencesService, UserProcessModel, TranslationService } from '@alfresco/adf-core';
+import { LogService, UserPreferencesService, UserProcessModel, TranslationService, FormFieldModel } from '@alfresco/adf-core';
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MOMENT_DATE_FORMATS, MomentDateAdapter } from '@alfresco/adf-core';
@@ -76,6 +76,8 @@ export class StartTaskComponent implements OnInit {
 
     formKey: number;
 
+    field: FormFieldModel;
+
     /**
      * Constructor
      * @param auth
@@ -91,6 +93,7 @@ export class StartTaskComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.field = new FormFieldModel(new FormModel(), {id: this.assigneeId, value: this.assigneeId, placeholder: 'Assignee'});
         this.preferences.locale$.subscribe((locale) => {
             this.dateAdapter.setLocale(locale);
         });
@@ -144,6 +147,10 @@ export class StartTaskComponent implements OnInit {
                     this.error.emit(err);
                     this.logService.error('An error occurred while creating new task');
                 });
+    }
+
+    getAssigneeId(userId) {
+        this.assigneeId = userId;
     }
 
     private attachForm(taskId: string, formKey: number): Observable<any> {

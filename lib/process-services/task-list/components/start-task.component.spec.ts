@@ -249,7 +249,24 @@ describe('StartTaskComponent', () => {
         });
     });
 
-    it('should not attach a form when a form id is not slected', () => {
+    it('should assign task with id of selected user assigned', () => {
+        let successSpy = spyOn(component.success, 'emit');
+        component.appId = 42;
+        component.taskDetailsModel = new TaskDetailsModel(taskDetailsMock);
+        component.formKey = 1204;
+        component.getAssigneeId(testUser.id);
+        fixture.detectChanges();
+        let createTaskButton = <HTMLElement> element.querySelector('#button-start');
+        createTaskButton.click();
+        expect(successSpy).toHaveBeenCalledWith({
+            id: 91,
+            name: 'fakeName',
+            formKey: 1204,
+            assignee: testUser
+        });
+    });
+
+    it('should not attach a form when a form id is not selected', () => {
         let attachFormToATask = spyOn(service, 'attachFormToATask').and.returnValue(Observable.of());
         spyOn(service, 'createNewTask').and.callFake(
             function() {
