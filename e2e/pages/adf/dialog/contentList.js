@@ -20,13 +20,14 @@ var Util = require('../../../util/util');
 var ContentList = function () {
     var deleteContent = element(by.css("button[data-automation-id*='DELETE']"));
     var metadataAction = element(by.css("button[data-automation-id*='METADATA']"));
+    var versionManagerAction = element(by.css("button[data-automation-id*='VERSIONS']"));
     var moveContent = element(by.css("button[data-automation-id*='MOVE']"));
     var copyContent = element(by.css("button[data-automation-id*='COPY']"));
     var downloadContent = element(by.css("button[data-automation-id*='DOWNLOAD']"));
     var actionMenu = element(by.css("div[role='menu']"));
     var optionButton = by.css("button[data-automation-id*='action_menu_']");
     var rowByRowName = by.xpath("ancestor::div[contains(@class, 'adf-datatable-row')]");
-    var nameColumn = by.css("div[id*='document-list-container'] div[class*='adf-datatable-row'] div[class*='--text full-width'] span");
+    var nameColumn = by.css("diva[id*='document-list-container'] div[class*='adf-datatable-row'] div[class*='--text full-width'] span");
     var nameColumnHeader = by.css("div[data-automation-id='auto_id_name']");
     var createdByColumn = by.css("div[class*='--text'][title='Created by'] span");
     var createdByColumnHeader = by.css("div[data-automation-id*='auto_id_createdByUser']");
@@ -85,6 +86,12 @@ var ContentList = function () {
         this.clickOnActionMenu(content);
         this.waitForContentOptions();
         metadataAction.click();
+    };
+
+    this.versionManagerContent = function (content) {
+        this.clickOnActionMenu(content);
+        this.waitForContentOptions();
+        versionManagerAction.click();
     };
 
     this.moveContent = function (content) {

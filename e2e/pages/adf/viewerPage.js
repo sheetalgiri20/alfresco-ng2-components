@@ -54,7 +54,6 @@ var ViewerToolbarPage = function () {
     var unsupportedFileContainer = element(by.cssContainingText(".label", "Document preview could not be loaded"));
     var pageCanvas = element.all(by.css("div[class='canvasWrapper']")).first();
     var activeTab = element(by.css("div[class*='mat-tab-label-active']"));
-    var uploadNewVersionButton = element(by.css("input[data-automation-id='upload-single-file']"));
     var rightChevron = element(by.css("div[class*='header-pagination-after']"));
 
     this.canvasHeight = function () {
@@ -405,16 +404,6 @@ var ViewerToolbarPage = function () {
         var versionsTab = element(by.cssContainingText("div[id*='mat-tab-label']", "Versions"));
         Util.waitUntilElementIsVisible(versionsTab);
         versionsTab.click();
-        return this;
-    };
-
-    this.checkUploadVersionsButtonIsDisplayed = function() {
-        Util.waitUntilElementIsVisible(uploadNewVersionButton);
-        return this;
-    };
-
-    this.checkVersionIsDisplayed = function(version) {
-        Util.waitUntilElementIsVisible(element(by.cssContainingText("h4[class*='adf-version-list-item-name']", version)));
         return this;
     };
 
