@@ -258,6 +258,17 @@ export class CustomResourcesService {
         return isCustomSources;
     }
 
+    isSupportedSource(folderId: string): boolean {
+        let isSupportedSources = false;
+        const sources = ['-my-', '-root-', '-shared-'];
+
+        if (sources.indexOf(folderId) > -1) {
+            isSupportedSources = true;
+        }
+
+        return isSupportedSources;
+    }
+
     /**
      * Gets a folder's contents.
      * @param nodeId ID of the target folder node
@@ -289,30 +300,36 @@ export class CustomResourcesService {
      * @param pagination Specifies how to paginate the results
      * @returns List of node IDs
      */
-    getCorrespondingNodeIds(nodeId: string, pagination: PaginationModel): Observable<string[]> {
+    getCorrespondingNodeIds(nodeId: string, pagination: PaginationModel = {}): Observable<string[]> {
+        const defaults = {
+            maxItems: 100,
+            skipCount: 0
+        };
+        const options = Object.assign(defaults, pagination);
+
         if (nodeId === '-trashcan-') {
-            return Observable.fromPromise(this.apiService.nodesApi.getDeletedNodes()
+            return Observable.fromPromise(this.apiService.nodesApi.getDeletedNodes(options)
                 .then(result => result.list.entries.map(node => node.entry.id)));
 
         } else if (nodeId === '-sharedlinks-') {
-            return Observable.fromPromise(this.apiService.sharedLinksApi.findSharedLinks()
+            return Observable.fromPromise(this.apiService.sharedLinksApi.findSharedLinks(options)
                 .then(result => result.list.entries.map(node => node.entry.nodeId)));
 
         } else if (nodeId === '-sites-') {
-            return Observable.fromPromise(this.apiService.sitesApi.getSites()
+            return Observable.fromPromise(this.apiService.sitesApi.getSites(options)
                 .then(result => result.list.entries.map(node => node.entry.guid)));
 
         } else if (nodeId === '-mysites-') {
-            return Observable.fromPromise(this.apiService.peopleApi.getSiteMembership('-me-')
+            return Observable.fromPromise(this.apiService.peopleApi.getSiteMembership('-me-', options)
                 .then(result => result.list.entries.map(node => node.entry.guid)));
 
         } else if (nodeId === '-favorites-') {
-            return Observable.fromPromise(this.apiService.favoritesApi.getFavorites('-me-')
+            return Observable.fromPromise(this.apiService.favoritesApi.getFavorites('-me-', options)
                 .then(result => result.list.entries.map(node => node.entry.targetGuid)));
 
         } else if (nodeId === '-recent-') {
             return new Observable(observer => {
-                this.getRecentFiles('-me-', pagination)
+                this.getRecentFiles('-me-', options)
                     .subscribe((recentFiles) => {
                         let recentFilesIdS = recentFiles.list.entries.map(node => node.entry.id);
                         observer.next(recentFilesIdS);
@@ -320,9 +337,17 @@ export class CustomResourcesService {
                     });
             });
 
+        } else if (nodeId) {
+            // cases when nodeId is '-my-', '-root-' or '-shared-'
+            return Observable.fromPromise(this.apiService.nodesApi.getNode(nodeId, options)
+                .then(node => [node.entry.id]));
         }
 
         return Observable.of([]);
+    }
+
+    hasCorrespondingNodeIds(nodeId: string): boolean {
+        return this.isCustomSource(nodeId) || this.isSupportedSource(nodeId);
     }
 
     private getIncludesFields(includeFields: string[]): string[] {
