@@ -32,24 +32,24 @@ export class CommentsPage {
         return this.numberOfComments.getText();
     }
 
-    checkUserIconIsDisplayed(number) {
+    checkUserIconIsDisplayed(indexComment) {
         Util.waitUntilElementIsVisible(this.commentUserIcon);
-        return this.commentUserIcon.get(number);
+        return this.commentUserIcon.get(indexComment);
     }
 
-    getUserName(number) {
+    getUserName(indexComment) {
         Util.waitUntilElementIsVisible(this.commentUserName);
-        return this.commentUserName.get(number).getText();
+        return this.commentUserName.get(indexComment).getText();
     }
 
-    getMessage(number) {
+    getMessage(indexComment) {
         Util.waitUntilElementIsVisible(this.commentMessage);
-        return this.commentMessage.get(number).getText();
+        return this.commentMessage.get(indexComment).getText();
     }
 
-    getTime(number) {
+    getTime(indexComment) {
         Util.waitUntilElementIsVisible(this.commentTime);
-        return this.commentTime.get(number).getText();
+        return this.commentTime.get(indexComment).getText();
     }
 
     checkCommentInputIsNotDisplayed() {

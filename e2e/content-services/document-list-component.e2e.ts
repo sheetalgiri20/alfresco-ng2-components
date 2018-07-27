@@ -225,7 +225,6 @@ describe('Document List Component', () => {
             'location': resources.Files.ADF_DOCUMENTS.TEST.file_location
         });
 
-
         let fileANode, fileBNode, fileCNode;
 
         beforeAll(async (done) => {
